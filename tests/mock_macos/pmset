@@ -1,0 +1,2 @@
+#!/bin/sh
+printf 'Now drawing from %s\n -InternalBattery-0 (id=1234)\t95%%; discharging\n' "'Battery Power'"

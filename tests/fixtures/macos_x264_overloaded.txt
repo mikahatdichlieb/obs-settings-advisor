@@ -1,0 +1,83 @@
+19:22:03.415: CPU Name: Apple M1
+19:22:03.415: CPU Speed: 2400MHz
+19:22:03.415: Physical Cores: 8, Logical Cores: 8
+19:22:03.415: Physical Memory: 8192MB Total
+19:22:03.415: Model Identifier: MacBookAir10,1
+19:22:03.415: OS Name: macOS
+19:22:03.415: OS Version: Version 14.6.1 (Build 23G93)
+19:22:03.415: Rosetta translation used: false
+19:22:03.415: Kernel Version: 23.6.0
+19:22:03.416: hotkeys-cocoa: Using layout 'com.apple.keylayout.US'
+19:22:03.480: Current Date/Time: 2026-11-18, 19:22:03
+19:22:03.480: Browser Hardware Acceleration: true
+19:22:03.480: Qt Version: 6.6.3 (runtime), 6.6.3 (compiled)
+19:22:03.480: Portable mode: false
+19:22:03.510: OBS 30.2.3 (mac)
+19:22:03.510: ---------------------------------
+19:22:03.512: ---------------------------------
+19:22:03.512: audio settings reset:
+19:22:03.512: 	samples per sec: 48000
+19:22:03.512: 	speakers:        2
+19:22:03.512: 	max buffering:   960 milliseconds
+19:22:03.512: 	buffering type:  dynamically increasing
+19:22:03.513: ---------------------------------
+19:22:03.513: Initializing OpenGL...
+19:22:03.560: Loading up OpenGL on adapter Apple Apple M1
+19:22:03.560: OpenGL loaded successfully, version 4.1 Metal - 88.1, shading language 4.10
+19:22:03.590: ---------------------------------
+19:22:03.590: video settings reset:
+19:22:03.590: 	base resolution:   1920x1080
+19:22:03.590: 	output resolution: 1920x1080
+19:22:03.590: 	downscale filter:  Bicubic
+19:22:03.590: 	fps:               60/1
+19:22:03.590: 	format:            NV12
+19:22:03.590: 	YUV mode:          Rec. 709/Partial
+19:22:03.590: NV12 texture support not available
+19:22:04.210: ---------------------------------
+19:22:04.210: Available Encoders:
+19:22:04.210:   Video Encoders:
+19:22:04.210: 	- com.apple.videotoolbox.videoencoder.ave.avc (Apple VT H264 Hardware Encoder)
+19:22:04.210: 	- com.apple.videotoolbox.videoencoder.ave.hevc (Apple VT HEVC Hardware Encoder)
+19:22:04.210: 	- ffmpeg_svt_av1 (SVT-AV1)
+19:22:04.210: 	- ffmpeg_aom_av1 (AOM AV1)
+19:22:04.210: 	- obs_x264 (x264)
+19:22:04.210:   Audio Encoders:
+19:22:04.210: 	- CoreAudio_AAC (CoreAudio AAC)
+19:22:04.210: 	- ffmpeg_aac (FFmpeg AAC)
+19:22:04.210: 	- ffmpeg_opus (FFmpeg Opus)
+19:22:04.210: ==== Startup complete ===============================================
+19:22:04.240: All scene data cleared
+19:22:04.240: ------------------------------------------------
+19:22:04.301: Switched to scene 'Scene'
+19:22:04.301: ------------------------------------------------
+19:30:11.004: [x264 encoder: 'simple_video_stream'] preset: medium
+19:30:11.004: [x264 encoder: 'simple_video_stream'] profile: high
+19:30:11.004: [x264 encoder: 'simple_video_stream'] settings:
+19:30:11.004: 	rate_control: VBR
+19:30:11.004: 	bitrate:      8000
+19:30:11.004: 	buffer size:  8000
+19:30:11.004: 	crf:          23
+19:30:11.004: 	fps_num:      60
+19:30:11.004: 	fps_den:      1
+19:30:11.004: 	width:        1920
+19:30:11.004: 	height:       1080
+19:30:11.004: 	keyint:       250
+19:30:11.004:
+19:30:11.020: [CoreAudio AAC: 'simple_aac']: settings:
+19:30:11.020: 	mode:          AAC
+19:30:11.020: 	bitrate:       160
+19:30:11.020: 	sample rate:   48000
+19:30:11.020: 	cbr:           off
+19:30:11.020: 	output buffer: 1536
+19:30:11.020:
+19:30:11.030: [rtmp stream: 'simple_stream'] Connecting to RTMP URL rtmps://a.rtmps.youtube.com:443/live2...
+19:30:11.371: [rtmp stream: 'simple_stream'] Connection to rtmps://a.rtmps.youtube.com:443/live2 successful
+19:30:11.380: ==== Streaming Start ===============================================
+19:40:11.950: [rtmp stream: 'simple_stream'] User stopped the stream
+19:40:11.950: Output 'simple_stream': stopping
+19:40:11.950: Output 'simple_stream': Total frames output: 35880
+19:40:11.950: Output 'simple_stream': Total drawn frames: 36000
+19:40:11.951: [rtmp stream: 'simple_stream'] Freeing 0 remaining packets
+19:40:11.951: ==== Streaming Stop ================================================
+19:40:11.990: Video stopped, number of skipped frames due to encoding lag: 4466/36000 (12.4%)
+19:41:02.300: ==== Shutting down ==================================================

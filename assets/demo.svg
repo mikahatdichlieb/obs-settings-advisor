@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="636" viewBox="0 0 1200 636" xml:space="preserve">
+  <rect x="0.5" y="0.5" width="1199" height="635" rx="8" fill="#0D1117" stroke="#30363D"/>
+  <text x="36" y="34" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace" font-size="14" fill="#7D8590">tests/fixtures/windows_nvenc_stream_wifi.txt, shortened</text>
+  <line x1="0.5" y1="52" x2="1199.5" y2="52" stroke="#30363D"/>
+  <g font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace" font-size="17">
+        <text x="36" y="92"><tspan fill="#3FB950">$ </tspan><tspan fill="#E6EDF3">python3 analyze_obs_log.py "%APPDATA%\obs-studio\logs\2026-11-20 21-04-11.txt"</tspan></text>
+    <text x="36" y="122"><tspan fill="#8B949E">{</tspan></text>
+    <text x="36" y="152"><tspan fill="#8B949E">  </tspan><tspan fill="#79C0FF">"obs_version"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#A5D6FF">"31.0.2 (64-bit, windows)"</tspan><tspan fill="#8B949E">,</tspan></text>
+    <text x="36" y="182"><tspan fill="#8B949E">  </tspan><tspan fill="#79C0FF">"summary"</tspan><tspan fill="#8B949E">: {</tspan></text>
+    <text x="36" y="212"><tspan fill="#8B949E">    </tspan><tspan fill="#79C0FF">"encoder_in_use"</tspan><tspan fill="#8B949E">: { </tspan><tspan fill="#79C0FF">"family"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#A5D6FF">"NVENC"</tspan><tspan fill="#8B949E">, </tspan><tspan fill="#79C0FF">"rate_control"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#A5D6FF">"CBR"</tspan><tspan fill="#8B949E">, </tspan><tspan fill="#79C0FF">"bitrate_kbps"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#FFA657">6000</tspan><tspan fill="#8B949E">, ...},</tspan></text>
+    <text x="36" y="242"><tspan fill="#8B949E">    </tspan><tspan fill="#79C0FF">"output_resolution"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#A5D6FF">"1920x1080"</tspan><tspan fill="#8B949E">, </tspan><tspan fill="#79C0FF">"fps"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#FFA657">60</tspan><tspan fill="#8B949E">,</tspan></text>
+    <text x="36" y="272"><tspan fill="#8B949E">    </tspan><tspan fill="#79C0FF">"worst_network_dropped_pct"</tspan><tspan fill="#8B949E">:  </tspan><tspan fill="#FFA657">2.9</tspan><tspan fill="#8B949E">,   </tspan><tspan fill="#6E7681">// network</tspan></text>
+    <text x="36" y="302"><tspan fill="#8B949E">    </tspan><tspan fill="#79C0FF">"worst_encoder_skipped_pct"</tspan><tspan fill="#8B949E">:  </tspan><tspan fill="#FFA657">0.0</tspan><tspan fill="#8B949E">,   </tspan><tspan fill="#6E7681">// encoder</tspan></text>
+    <text x="36" y="332"><tspan fill="#8B949E">    </tspan><tspan fill="#79C0FF">"worst_rendering_lagged_pct"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#FFA657">0.6</tspan><tspan fill="#8B949E">    </tspan><tspan fill="#6E7681">// GPU</tspan></text>
+    <text x="36" y="362"><tspan fill="#8B949E">  },</tspan></text>
+    <text x="36" y="392"><tspan fill="#8B949E">  </tspan><tspan fill="#79C0FF">"problems"</tspan><tspan fill="#8B949E">: [</tspan></text>
+    <text x="36" y="422"><tspan fill="#8B949E">    { </tspan><tspan fill="#79C0FF">"id"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#A5D6FF">"network_dropped_frames"</tspan><tspan fill="#8B949E">, </tspan><tspan fill="#79C0FF">"severity"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#F2CC60">"warning"</tspan><tspan fill="#8B949E">,</tspan></text>
+    <text x="36" y="452"><tspan fill="#8B949E">      </tspan><tspan fill="#79C0FF">"fix_hints"</tspan><tspan fill="#8B949E">: [</tspan><tspan fill="#A5D6FF">"The stream ran over Wi-Fi: ... Try Ethernet first."</tspan><tspan fill="#8B949E">, ...] },</tspan></text>
+    <text x="36" y="482"><tspan fill="#8B949E">    { </tspan><tspan fill="#79C0FF">"id"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#A5D6FF">"rendering_lag"</tspan><tspan fill="#8B949E">, </tspan><tspan fill="#79C0FF">"severity"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#F2CC60">"warning"</tspan><tspan fill="#8B949E">,</tspan></text>
+    <text x="36" y="512"><tspan fill="#8B949E">      </tspan><tspan fill="#79C0FF">"fix_hints"</tspan><tspan fill="#8B949E">: [</tspan><tspan fill="#A5D6FF">"Run OBS as administrator (Windows) so it gets GPU ..."</tspan><tspan fill="#8B949E">, ...] },</tspan></text>
+    <text x="36" y="542"><tspan fill="#8B949E">    { </tspan><tspan fill="#79C0FF">"id"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#A5D6FF">"stream_disconnects"</tspan><tspan fill="#8B949E">, </tspan><tspan fill="#79C0FF">"severity"</tspan><tspan fill="#8B949E">: </tspan><tspan fill="#F2CC60">"warning"</tspan><tspan fill="#8B949E">, ... }</tspan></text>
+    <text x="36" y="572"><tspan fill="#8B949E">  ]</tspan></text>
+    <text x="36" y="602"><tspan fill="#8B949E">}</tspan></text>
+  </g>
+</svg>

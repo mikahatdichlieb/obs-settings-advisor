@@ -1,0 +1,8 @@
+#!/bin/sh
+case "$2" in
+  machdep.cpu.brand_string) echo "Apple M1 Pro" ;;
+  hw.physicalcpu) echo 10 ;; hw.logicalcpu) echo 10 ;;
+  hw.perflevel0.physicalcpu) echo 8 ;; hw.perflevel1.physicalcpu) echo 2 ;;
+  hw.model) echo "MacBookPro18,3" ;; hw.memsize) echo 17179869184 ;;
+  *) exit 1 ;;
+esac

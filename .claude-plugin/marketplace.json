@@ -1,0 +1,15 @@
+{
+  "name": "obs-settings-advisor",
+  "description": "OBS Studio settings advisor skill for Claude Code.",
+  "owner": {
+    "name": "mikahatdichlieb"
+  },
+  "plugins": [
+    {
+      "name": "obs-settings-advisor",
+      "source": "./",
+      "description": "Recommends OBS Studio settings for your PC and goal, and diagnoses dropped frames, encoder overload and rendering lag from real OBS logs. Read-only.",
+      "version": "0.1.0"
+    }
+  ]
+}

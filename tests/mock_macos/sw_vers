@@ -1,0 +1,2 @@
+#!/bin/sh
+case "$1" in -productName) echo macOS ;; -productVersion) echo 14.6.1 ;; -buildVersion) echo 23G93 ;; esac

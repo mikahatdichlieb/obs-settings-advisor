@@ -1,0 +1,89 @@
+17:10:13.501: Platform: Wayland
+17:10:13.501: CPU Name: AMD Ryzen 7 5800X 8-Core Processor
+17:10:13.501: CPU Speed: 4562.263MHz
+17:10:13.501: Physical Cores: 8, Logical Cores: 16
+17:10:13.501: Physical Memory: 64173MB Total, 2042MB Free
+17:10:13.501: Kernel Version: Linux 6.17.4-arch1-1
+17:10:13.501: Distribution: "Arch Linux" Unknown
+17:10:13.501: Desktop Environment: Hyprland (Hyprland)
+17:10:13.501: Session Type: wayland
+17:10:13.501: Current Date/Time: 2026-11-04, 17:10:13
+17:10:13.501: Browser Hardware Acceleration: true
+17:10:13.501: Qt Version: 6.10.0 (runtime), 6.10.0 (compiled)
+17:10:13.501: Portable mode: false
+17:10:13.530: OBS 32.0.1 (linux)
+17:10:13.530: ---------------------------------
+17:10:13.531: ---------------------------------
+17:10:13.531: audio settings reset:
+17:10:13.531: 	samples per sec: 48000
+17:10:13.531: 	speakers:        2
+17:10:13.531: 	max buffering:   960 milliseconds
+17:10:13.531: 	buffering type:  dynamically increasing
+17:10:13.533: ---------------------------------
+17:10:13.533: Initializing OpenGL...
+17:10:13.533: Using EGL/Wayland
+17:10:13.570: Initialized EGL 1.5
+17:10:13.620: Loading up OpenGL on adapter NVIDIA Corporation NVIDIA GeForce RTX 3070/PCIe/SSE2
+17:10:13.620: OpenGL loaded successfully, version 3.3.0 NVIDIA 580.95.05, shading language 3.30 NVIDIA via Cg compiler
+17:10:13.710: ---------------------------------
+17:10:13.710: video settings reset:
+17:10:13.710: 	base resolution:   2560x1440
+17:10:13.710: 	output resolution: 2560x1440
+17:10:13.710: 	downscale filter:  Bicubic
+17:10:13.710: 	fps:               240/1
+17:10:13.710: 	format:            NV12
+17:10:13.710: 	YUV mode:          Rec. 709/Full
+17:10:13.710: NV12 texture support enabled
+17:10:13.710: P010 texture support not available
+17:10:13.950: [obs-browser]: Blacklisted driver detected, disabling browser source hardware acceleration.
+17:10:13.980: LIBVA_DRIVER_NAME variable is set, this could prevent FFmpeg VAAPI from working correctly
+17:10:14.170: VAAPI: API version 1.22
+17:10:14.220: FFmpeg VAAPI H264 encoding not supported
+17:10:14.440: FFmpeg VAAPI AV1 encoding not supported
+17:10:14.650: FFmpeg VAAPI HEVC encoding not supported
+17:10:14.810: [obs-nvenc] NVENC version: 13.0 (compiled) / 13.0 (driver), CUDA driver version: 13.00, AV1 supported: false
+17:10:15.450: ---------------------------------
+17:10:15.450: Available Encoders:
+17:10:15.450:   Video Encoders:
+17:10:15.450: 	- ffmpeg_svt_av1 (SVT-AV1)
+17:10:15.450: 	- ffmpeg_aom_av1 (AOM AV1)
+17:10:15.450: 	- obs_nvenc_h264_tex (NVIDIA NVENC H.264)
+17:10:15.450: 	- obs_nvenc_hevc_tex (NVIDIA NVENC HEVC)
+17:10:15.450: 	- obs_x264 (x264)
+17:10:15.450:   Audio Encoders:
+17:10:15.450: 	- ffmpeg_aac (FFmpeg AAC)
+17:10:15.450: 	- ffmpeg_opus (FFmpeg Opus)
+17:10:15.450: ==== Startup complete ===============================================
+17:10:15.470: All scene data cleared
+17:10:15.470: ------------------------------------------------
+17:10:15.480: [pipewire] Screencast session created
+17:11:26.292: [obs-nvenc: 'advanced_video_recording'] settings:
+17:11:26.292: 	codec:        H264
+17:11:26.292: 	rate_control: CQP
+17:11:26.292: 	cqp:          17
+17:11:26.292: 	keyint:       250
+17:11:26.292: 	preset:       p7
+17:11:26.292: 	tuning:       hq
+17:11:26.292: 	multipass:    disabled
+17:11:26.292: 	profile:      high
+17:11:26.292: 	width:        2560
+17:11:26.292: 	height:       1440
+17:11:26.292: 	b-frames:     0
+17:11:26.292: 	b-ref-mode:   0
+17:11:26.292: 	lookahead:    true (28 frames)
+17:11:26.292: 	aq:           true
+17:11:26.292:
+17:11:26.378: ---------------------------------
+17:11:26.379: [FFmpeg aac encoder: 'Track1'] bitrate: 160, channels: 2, channel_layout: stereo, track: 1
+17:11:26.379:
+17:11:26.381: ==== Replay Buffer Start ===========================================
+17:12:40.906: [ffmpeg muxer: 'Replay Buffer'] Using muxer settings:
+17:12:40.906: 	movflags=frag_keyframe+empty_moov+delay_moov
+17:12:40.968: [ffmpeg muxer: 'Replay Buffer'] Wrote replay buffer to '/home/janedoe/Videos/OBS/2026-11-04 17-12-40.mp4'
+17:12:47.445: Output 'Replay Buffer': stopping
+17:12:47.445: Output 'Replay Buffer': Total frames output: 10689
+17:12:47.445: Output 'Replay Buffer': Total drawn frames: 7914 (19454 attempted)
+17:12:47.445: Output 'Replay Buffer': Number of lagged frames due to rendering lag/stalls: 11540 (59.3%)
+17:12:47.445: Video stopped, number of skipped frames due to encoding lag: 10600/10722 (98.9%)
+17:12:47.445: ==== Replay Buffer Stop ============================================
+17:13:46.216: ==== Shutting down ==================================================

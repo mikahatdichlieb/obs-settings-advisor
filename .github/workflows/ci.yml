@@ -1,0 +1,84 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate SKILL.md
+        run: python tests/validate_skill.py
+
+      - name: Unit tests (analyzer on all OS, bash scripts on macOS/Linux)
+        run: python -m unittest discover -s tests -v
+
+      - name: ShellCheck
+        if: runner.os == 'Linux'
+        run: shellcheck skills/obs-settings-advisor/scripts/*.sh tests/mock_macos/*
+
+      - name: Run bash scripts with the system bash (3.2 on macOS)
+        if: runner.os != 'Windows'
+        run: |
+          /bin/bash --version | head -n 1
+          /bin/bash skills/obs-settings-advisor/scripts/detect_hardware.sh | python -m json.tool
+          /bin/bash skills/obs-settings-advisor/scripts/find_obs_logs.sh || test $? -eq 1
+
+      - name: PSScriptAnalyzer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          # ParseError must be listed explicitly, or syntax errors are filtered out
+          $r = Invoke-ScriptAnalyzer -Path skills/obs-settings-advisor/scripts -Severity ParseError,Error,Warning
+          $r | Format-Table -AutoSize | Out-String | Write-Output
+          if ($r) { exit 1 }
+
+      - name: Run PowerShell scripts (Windows PowerShell 5.1 and PowerShell 7)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $scripts = 'skills/obs-settings-advisor/scripts'
+          $logDir = Join-Path $env:APPDATA 'obs-studio\logs'
+          foreach ($exe in 'powershell', 'pwsh') {
+            Write-Output "=== $exe"
+            $out = & $exe -NoProfile -ExecutionPolicy Bypass -File "$scripts/detect_hardware.ps1"
+            if ($LASTEXITCODE -ne 0) { throw "$exe detect_hardware.ps1 failed" }
+            ($out -join "`n") | ConvertFrom-Json | Out-Null
+            Write-Output ($out -join "`n")
+            if (($out -join "`n") -match [regex]::Escape($env:USERNAME)) { throw "username leaked in detect_hardware output" }
+
+            # no logs yet: valid JSON and exit code 1
+            $out = & $exe -NoProfile -ExecutionPolicy Bypass -File "$scripts/find_obs_logs.ps1"
+            if ($LASTEXITCODE -ne 1) { throw "$exe find_obs_logs.ps1 should exit 1 without logs" }
+            ($out -join "`n") | ConvertFrom-Json | Out-Null
+
+            # with a log: redacted path that the analyzer can open as-is
+            New-Item -ItemType Directory -Force $logDir | Out-Null
+            Copy-Item tests/fixtures/windows_nvenc_stream_wifi.txt (Join-Path $logDir '2026-11-20 21-04-11.txt')
+            $out = & $exe -NoProfile -ExecutionPolicy Bypass -File "$scripts/find_obs_logs.ps1"
+            if ($LASTEXITCODE -ne 0) { throw "$exe find_obs_logs.ps1 failed with a log present" }
+            $text = $out -join "`n"
+            Write-Output $text
+            if ($text -match [regex]::Escape($env:USERNAME)) { throw "username leaked in find_obs_logs output" }
+            $found = $text | ConvertFrom-Json
+            if ($found.logs[0].path -notlike '%APPDATA%*') { throw "path not redacted: $($found.logs[0].path)" }
+            if (-not $found.logs[0].has_output_stats) { throw "has_output_stats should be true" }
+            python "$scripts/analyze_obs_log.py" $found.logs[0].path --compact | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "analyzer could not open the redacted path" }
+            Remove-Item -Recurse -Force (Join-Path $env:APPDATA 'obs-studio')
+          }
+          exit 0

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+dist/
+*.zip
+# never commit real OBS logs: they contain usernames, paths and device IDs
+*.log
+/logs/

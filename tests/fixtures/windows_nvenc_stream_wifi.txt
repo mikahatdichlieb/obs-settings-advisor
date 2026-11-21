@@ -1,0 +1,146 @@
+21:04:11.118: CPU Name: AMD Ryzen 5 5600X 6-Core Processor
+21:04:11.118: CPU Speed: 3693MHz
+21:04:11.118: Physical Cores: 6, Logical Cores: 12
+21:04:11.118: Physical Memory: 32694MB Total, 19220MB Free
+21:04:11.118: Windows Version: 11.0 Build 26100 (release: 24H2; revision: 2605; 64-bit)
+21:04:11.118: Running as administrator: false
+21:04:11.118: Windows 11 Gaming Features:
+21:04:11.118: 	Game Bar: On
+21:04:11.118: 	Game DVR: Off
+21:04:11.118: 	Game DVR Background Recording: Off
+21:04:11.118: 	Game Mode: On
+21:04:11.118: 	Hardware GPU Scheduler: On
+21:04:11.120: Windows Security Status
+21:04:11.120: 	Firewall: Enabled
+21:04:11.141: Current Date/Time: 2026-11-20, 21:04:11
+21:04:11.141: Browser Hardware Acceleration: true
+21:04:11.141: Hide OBS windows from screen capture: false
+21:04:11.141: Qt Version: 6.8.2 (runtime), 6.8.2 (compiled)
+21:04:11.141: Portable mode: false
+21:04:11.141: OBS 31.0.2 (64-bit, windows)
+21:04:11.141: ---------------------------------
+21:04:11.143: ---------------------------------
+21:04:11.143: audio settings reset:
+21:04:11.143: 	samples per sec: 48000
+21:04:11.143: 	speakers:        2
+21:04:11.143: 	max buffering:   960 milliseconds
+21:04:11.143: 	buffering type:  dynamically increasing
+21:04:11.146: ---------------------------------
+21:04:11.146: Initializing D3D11...
+21:04:11.146: Available Video Adapters:
+21:04:11.149: 	Adapter 0: NVIDIA GeForce RTX 3060
+21:04:11.149: 	  Dedicated VRAM: 12616466432 (11.8 GiB)
+21:04:11.149: 	  Shared VRAM:    17112186880 (15.9 GiB)
+21:04:11.149: 	  PCI ID:         10de:2504
+21:04:11.149: 	  HAGS Status:    Enabled (Default: No, Driver status: Supported)
+21:04:11.149: 	  Driver Version: 32.0.15.6614
+21:04:11.149: 	  output 0:
+21:04:11.149: 	    name=LG ULTRAGEAR
+21:04:11.149: 	    pos={0, 0}
+21:04:11.149: 	    size={2560, 1440}
+21:04:11.149: 	    attached=true
+21:04:11.149: 	    refresh=165
+21:04:11.149: 	    bits_per_color=8
+21:04:11.149: 	    space=RGB_FULL_G22_NONE_P709
+21:04:11.149: 	    sdr_white_nits=80
+21:04:11.149: 	    dpi=96 (100%)
+21:04:11.151: Loading up D3D11 on adapter NVIDIA GeForce RTX 3060 (0)
+21:04:11.172: D3D11 loaded successfully, feature level used: b000
+21:04:11.172: DXGI increase maximum frame latency success
+21:04:11.172: D3D11 GPU priority setup failed (not admin)
+21:04:11.204: ---------------------------------
+21:04:11.204: video settings reset:
+21:04:11.204: 	base resolution:   2560x1440
+21:04:11.204: 	output resolution: 1920x1080
+21:04:11.204: 	downscale filter:  Lanczos
+21:04:11.204: 	fps:               60/1
+21:04:11.204: 	format:            NV12
+21:04:11.204: 	YUV mode:          Rec. 709/Partial
+21:04:11.204: NV12 texture support enabled
+21:04:11.204: P010 texture support enabled
+21:04:11.211: Audio monitoring device:
+21:04:11.211: 	name: Default
+21:04:11.211: 	id: default
+21:04:11.700: [obs-nvenc] NVENC version: 12.2 (compiled) / 13.0 (driver), CUDA driver version: 12.70, AV1 supported: false
+21:04:11.905: ---------------------------------
+21:04:11.905: Available Encoders:
+21:04:11.905:   Video Encoders:
+21:04:11.905: 	- ffmpeg_svt_av1 (SVT-AV1)
+21:04:11.905: 	- ffmpeg_aom_av1 (AOM AV1)
+21:04:11.905: 	- obs_nvenc_h264_tex (NVIDIA NVENC H.264)
+21:04:11.905: 	- obs_nvenc_hevc_tex (NVIDIA NVENC HEVC)
+21:04:11.905: 	- obs_x264 (x264)
+21:04:11.905:   Audio Encoders:
+21:04:11.905: 	- ffmpeg_aac (FFmpeg AAC)
+21:04:11.905: 	- ffmpeg_opus (FFmpeg Opus)
+21:04:11.905: 	- ffmpeg_pcm_s16le (FFmpeg PCM (16-bit))
+21:04:11.905: ==== Startup complete ===============================================
+21:04:11.925: All scene data cleared
+21:04:11.925: ------------------------------------------------
+21:04:11.990: Switched to scene 'Gameplay'
+21:04:11.990: ------------------------------------------------
+21:10:01.220: [rtmp stream: 'adv_stream'] Connecting to RTMP URL rtmp://fra05.contribute.live-video.net/app...
+21:10:01.221: [rtmp stream: 'adv_stream'] Interface: Intel(R) Wi-Fi 6 AX201 160MHz (wireless, 1201 mbps)
+21:10:01.240: [obs-nvenc: 'advanced_video_stream'] settings:
+21:10:01.240: 	codec:        H264
+21:10:01.240: 	rate_control: CBR
+21:10:01.240: 	bitrate:      6000
+21:10:01.240: 	keyint:       120
+21:10:01.240: 	preset:       p5
+21:10:01.240: 	tuning:       hq
+21:10:01.240: 	multipass:    qres
+21:10:01.240: 	profile:      high
+21:10:01.240: 	width:        1920
+21:10:01.240: 	height:       1080
+21:10:01.240: 	b-frames:     2
+21:10:01.240: 	b-ref-mode:   0
+21:10:01.240: 	lookahead:    false
+21:10:01.240: 	aq:           true
+21:10:01.240:
+21:10:01.251: ---------------------------------
+21:10:01.251: [FFmpeg aac encoder: 'adv_stream_aac'] bitrate: 160, channels: 2, channel_layout: stereo, track: 1
+21:10:01.251:
+21:10:01.402: [rtmp stream: 'adv_stream'] Connection to rtmp://fra05.contribute.live-video.net/app successful
+21:10:01.410: ==== Streaming Start ===============================================
+21:10:02.020: [obs-nvenc: 'advanced_video_recording'] settings:
+21:10:02.020: 	codec:        HEVC
+21:10:02.020: 	rate_control: CQP
+21:10:02.020: 	cqp:          20
+21:10:02.020: 	keyint:       250
+21:10:02.020: 	preset:       p5
+21:10:02.020: 	tuning:       hq
+21:10:02.020: 	multipass:    disabled
+21:10:02.020: 	profile:      main
+21:10:02.020: 	width:        2560
+21:10:02.020: 	height:       1440
+21:10:02.020: 	b-frames:     2
+21:10:02.020: 	b-ref-mode:   0
+21:10:02.020: 	lookahead:    false
+21:10:02.020: 	aq:           true
+21:10:02.020:
+21:10:02.031: [FFmpeg aac encoder: 'Track1'] bitrate: 192, channels: 2, channel_layout: stereo, track: 1
+21:10:02.031:
+21:10:02.044: [ffmpeg muxer: 'adv_file_output'] Writing file 'C:/Users/JaneDoe/Videos/2026-11-20 21-10-02.mkv'...
+21:10:02.050: ==== Recording Start ===============================================
+21:31:44.512: [rtmp stream: 'adv_stream'] Socket error, recv() returned 0, SOCKERR: 10054
+21:31:44.513: [rtmp stream: 'adv_stream'] Disconnected from rtmp://fra05.contribute.live-video.net/app
+21:31:44.513: Output 'adv_stream': Reconnecting in 2.00 seconds..
+21:31:46.520: [rtmp stream: 'adv_stream'] Connecting to RTMP URL rtmp://fra05.contribute.live-video.net/app...
+21:31:46.701: [rtmp stream: 'adv_stream'] Connection to rtmp://fra05.contribute.live-video.net/app successful
+21:31:46.702: Output 'adv_stream': Reconnected successfully
+21:40:02.110: [ffmpeg muxer: 'adv_file_output'] Output of file 'C:/Users/JaneDoe/Videos/2026-11-20 21-10-02.mkv' stopped
+21:40:02.110: Output 'adv_file_output': stopping
+21:40:02.110: Output 'adv_file_output': Total frames output: 108000
+21:40:02.110: Output 'adv_file_output': Total drawn frames: 107310 (108000 attempted)
+21:40:02.110: Output 'adv_file_output': Number of lagged frames due to rendering lag/stalls: 690 (0.6%)
+21:40:02.111: ==== Recording Stop ================================================
+21:40:05.880: [rtmp stream: 'adv_stream'] User stopped the stream
+21:40:05.880: Output 'adv_stream': stopping
+21:40:05.880: Output 'adv_stream': Total frames output: 105120 (108240 attempted)
+21:40:05.880: Output 'adv_stream': Total drawn frames: 107540 (108240 attempted)
+21:40:05.880: Output 'adv_stream': Number of lagged frames due to rendering lag/stalls: 700 (0.6%)
+21:40:05.880: Output 'adv_stream': Number of dropped frames due to insufficient bandwidth/connection stalls: 3120 (2.9%)
+21:40:05.881: [rtmp stream: 'adv_stream'] Freeing 0 remaining packets
+21:40:05.881: ==== Streaming Stop ================================================
+21:40:05.902: Video stopped, number of skipped frames due to encoding lag: 54/108240 (0.0%)
+21:41:10.002: ==== Shutting down ==================================================
