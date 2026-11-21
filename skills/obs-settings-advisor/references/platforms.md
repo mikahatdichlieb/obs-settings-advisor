@@ -104,7 +104,7 @@ Based on the OBS knowledge base recording guides (see `sources.md`).
 - **Audio:** AAC 192-320 kbps, or lossless (FLAC/PCM in MKV/MOV) for editing. Use separate tracks
   (Advanced output) to split game, mic and voice chat.
 - **FPS above 60:** costs proportional GPU and encoder load; only for footage that needs it
-  (slow motion, high-FPS uploads).
+  (slow motion, high-FPS uploads, frame blending: see `encoders.md` section 11).
 - **Disk:** high-quality 1440p60 CQ recordings can exceed 50-100 Mbps. Record to an SSD.
 - **Stream + record:** "Same as stream" shares one encode (no extra cost, stream quality). A
   separate recording encoder doubles encoder work; check skipped frames when both run.

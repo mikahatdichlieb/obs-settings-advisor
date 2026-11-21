@@ -1,6 +1,6 @@
 ---
 name: obs-settings-advisor
-description: Recommends OBS Studio settings for the user's actual PC and goal (streaming to Twitch, YouTube or Kick, local recording, or both) and diagnoses OBS problems from real OBS logs. Use this skill whenever the user mentions OBS or OBS Studio settings, stream or recording quality, a pixelated, blurry, choppy or laggy stream, dropped frames, skipped frames, "Encoding overloaded", rendering lag, GPU overload, choosing an encoder (NVENC, AMF, QuickSync, x264, VideoToolbox, VAAPI, HEVC, AV1), bitrate, keyframe interval, output resolution, FPS, downscale filter, Twitch Enhanced Broadcasting, asks for the "best OBS settings" for their hardware, or wants a blur (f0e/blur) motion blur config that matches their OBS recordings, even if they do not say "settings". Advisory and read-only. It detects hardware and reads OBS logs, and never changes OBS configuration.
+description: Recommends OBS Studio settings for the user's actual PC and goal (streaming to Twitch, YouTube or Kick, local recording, or both) and diagnoses OBS problems from real OBS logs. Use this skill whenever the user mentions OBS or OBS Studio settings, stream or recording quality, a pixelated, blurry, choppy or laggy stream, dropped frames, skipped frames, "Encoding overloaded", rendering lag, GPU overload, choosing an encoder (NVENC, AMF, QuickSync, x264, VideoToolbox, VAAPI, HEVC, AV1), bitrate, keyframe interval, output resolution, FPS, downscale filter, Twitch Enhanced Broadcasting, asks for the "best OBS settings" for their hardware, or wants a blur (f0e/blur) motion blur config or a Smoothie recipe that matches their high-FPS OBS recordings, even if they do not say "settings". Advisory and read-only. It detects hardware and reads OBS logs, and never changes OBS configuration.
 ---
 
 # OBS Settings Advisor
@@ -51,7 +51,8 @@ The detection scripts only make sense on the user's own streaming/gaming PC.
 Collect these, asking **only for what the conversation has not already answered**, in one short
 message:
 
-- Stream, record locally, or both?
+- Stream, record locally, or both? If recording: for normal editing/upload, or high-FPS footage
+  for frame blending with blur or Smoothie ("blend goal")?
 - Platform (Twitch, YouTube, Kick, other) if streaming.
 - Upload speed if streaming (a speed test result; ideally the sustained value).
 - Gaming on the same PC? Which games, roughly: heavy (modern AAA, high-FPS competitive shooters)
@@ -71,7 +72,8 @@ Do not ask for hardware facts the scripts can detect. Ask for them only if detec
 
 The JSON contains OS and version, CPU model and cores, RAM, each GPU with vendor, model, driver
 and `hw_encoder` (`api`, `codecs`, `source`), displays with resolution and refresh rate, OBS
-installs and versions, and `warnings`. Read `warnings` and tell the user about anything relevant
+installs and versions, on Linux the session type and `obs.capture_tools` (obs-vkcapture,
+gpu-screen-recorder), and `warnings`. Read `warnings` and tell the user about anything relevant
 (missing driver, Microsoft Basic Display Adapter, LIBVA_DRIVER_NAME, VM, laptop with two GPUs).
 
 If the script fails or a field is null, say what is missing and ask the user for it. Never fill
@@ -105,6 +107,10 @@ sessions where a stream or recording was stopped). Pass a printed path unchanged
 ```
 python3 scripts/analyze_obs_log.py "<path from find_obs_logs>"
 ```
+
+For the blend goal add `--goal blend`: FPS above 60 is then expected, and the analyzer checks the
+high-FPS recording instead (`blend_*` problems: FPS too low or uneven, slow encoder settings,
+bitrate-based rate control, color format).
 
 On Windows use `python` or `py -3` if `python3` does not exist. The analyzer needs only the
 Python standard library (3.8+).
@@ -154,6 +160,10 @@ menu labels of the user's OBS version where you know them, and give the menu pat
 
 If the goal is unrealistic, say so **before** the table and base the table on what works.
 
+For the blend goal, build the table from the high-FPS profile in `references/encoders.md`
+section 11 (Fractional FPS Value for 144+ fps, quality-based rate control, fast preset, NV12). On
+Linux, also recommend the capture source from the same file (section 8) based on the session type.
+
 ### Step 6: Alternatives
 
 When there is a real tradeoff, give 2-3 alternatives in a short list, each with what it gains and
@@ -177,24 +187,26 @@ by testing:
 
 Offer to analyze the new log when they are done.
 
-### Step 8 (only when asked): blur config
+### Step 8 (only when asked): blur config or Smoothie recipe
 
-If the user wants motion blur with [blur](https://github.com/f0e/blur), write a
-`.blur-config.cfg` that fits their OBS recording, as the last step. Follow
-`references/blur.md`:
+If the user wants motion blur from their recordings, write the config for their tool as the last
+step: a `.blur-config.cfg` for [blur](https://github.com/f0e/blur) (`references/blur.md`) or a
+recipe `.ini` for [Smoothie](https://github.com/couleur-tweak-tips/smoothie-rs)
+(`references/smoothie.md`). If they have not picked a tool, ask; do not push one.
 
-1. Check that the OBS recording suits blur (high FPS that is a multiple of the output FPS,
-   quality-based rate control, fast encoder preset, no skipped frames in the log). Adjust the
-   recording recommendation first if it does not.
+1. Check that the OBS recording suits frame blending first (`references/encoders.md` section 11,
+   `analyze_obs_log.py --goal blend`: no skipped frames, no `blend_*` warnings). Adjust the
+   recording recommendation first if it does not. The config cannot fix missing frames.
 2. Ask only for missing wishes: amount of blur, output FPS, render speed vs. quality, file size.
-   If the user shares an existing config, review it first (old v1 keys, advanced keys without
-   `advanced: true`, broken values) and say what was silently ignored.
-3. Check the format against the user's blur version (header of an existing config, or the
-   current README) and output the config as a code block with one line of reasoning per changed
-   key.
-4. Write the file only if asked, and never overwrite an existing `.blur-config.cfg` without
-   showing the changes and getting a yes. This is the only file the skill may ever write, and it
-   is never inside the OBS config directory.
+   If the user shares an existing config, review it first with the checklist in the reference
+   (blur: old v1 keys and advanced keys that are ignored silently; Smoothie: typos and invalid
+   values that stop it) and say what was wrong.
+3. Check the format against the user's version (blur: header of an existing config or the
+   current README; Smoothie: the repository's `defaults.ini`) and output the config as a code
+   block with one line of reasoning per changed key.
+4. Write the file only if asked, and never overwrite an existing config or recipe without showing
+   the changes and getting a yes. These config files are the only files the skill may ever
+   write, and they are never inside the OBS config directory.
 
 ## Style
 
@@ -207,8 +219,9 @@ If the user wants motion blur with [blur](https://github.com/f0e/blur), write a
 
 ## References
 
-- `references/encoders.md`: encoder choice per vendor and generation, OBS encoder IDs, NVENC/AMF/QSV/VT/VAAPI/x264 settings.
+- `references/encoders.md`: encoder choice per vendor and generation, OBS encoder IDs, NVENC/AMF/QSV/VT/VAAPI/x264 settings, Linux capture sources, high-FPS recording profile for frame blending.
 - `references/platforms.md`: Twitch, YouTube, Kick and local recording constraints, upload rules (dated snapshot).
 - `references/log_patterns.md`: log lines, analyzer problem ids, causes and fixes.
 - `references/sources.md`: official docs and search queries for step 3.
-- `references/blur.md`: OBS recording settings for blur, blur config format and wish-to-key mapping (step 8).
+- `references/blur.md`: blur config format, wish-to-key mapping, review checklist (step 8).
+- `references/smoothie.md`: Smoothie recipe format, encoder presets, blur-to-Smoothie key mapping, review checklist (step 8).

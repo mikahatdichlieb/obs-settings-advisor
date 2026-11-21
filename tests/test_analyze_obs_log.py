@@ -16,10 +16,10 @@ alog = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(alog)
 
 
-def run(name):
+def run(name, *args):
     out, err = io.StringIO(), io.StringIO()
     with redirect_stdout(out), redirect_stderr(err):
-        code = alog.main([os.path.join(FIX, name)])
+        code = alog.main([os.path.join(FIX, name), *args])
     return code, (json.loads(out.getvalue()) if out.getvalue() else None), err.getvalue()
 
 
@@ -120,6 +120,65 @@ class LinuxReplay240(unittest.TestCase):
 
     def test_privacy(self):
         self.assertNotIn("janedoe", json.dumps(self.d))
+
+    def test_goal_blend(self):
+        code, d, _ = run("linux_nvenc_replay_240fps.txt", "--goal", "blend")
+        self.assertEqual(code, 0)
+        self.assertEqual(d["summary"]["goal"], "blend")
+        ids = problem_ids(d)
+        self.assertNotIn("fps_above_60", ids)  # high FPS is the point of a blend recording
+        self.assertEqual(ids.get("blend_slow_encoder_settings"), "warning")  # frames were skipped
+        slow = next(p for p in d["problems"] if p["id"] == "blend_slow_encoder_settings")
+        self.assertIn("preset p7", slow["evidence"])
+        self.assertIn("look-ahead on", slow["evidence"])
+        for pid in ("blend_fps_low", "blend_fps_uneven", "blend_color_format", "blend_bitrate_rate_control"):
+            self.assertNotIn(pid, ids)  # 240 fps, NV12, CQP
+
+
+def blend_log(fps="144/1", fmt="I444", stream=False):
+    lines = ["OBS 33.0.2 (linux)", "video settings reset:", "\tbase resolution:   1920x1080",
+             "\toutput resolution: 1920x1080", f"\tfps:               {fps}", f"\tformat:            {fmt}",
+             "[obs-nvenc: 'advanced_video_recording'] settings:", "\trate_control: CBR", "\tbitrate:      50000",
+             "\tpreset:       p4", "\tmultipass:    qres", "\tb-frames:     2", ""]
+    if stream:
+        lines.append("==== Streaming Start ===============================================")
+    lines += ["Output 'adv_file_output': stopping", "Output 'adv_file_output': Total frames output: 1000",
+              "Video stopped, number of skipped frames due to encoding lag: 0/1000 (0.0%)"]
+    return [x + "\n" for x in lines]
+
+
+class GoalBlend(unittest.TestCase):
+    def test_uneven_fps_cbr_i444(self):
+        ids = problem_ids(alog.diagnose(alog.analyze(blend_log()), "blend"))
+        self.assertEqual(ids.get("blend_fps_uneven"), "info")
+        self.assertEqual(ids.get("blend_color_format"), "info")
+        self.assertEqual(ids.get("blend_bitrate_rate_control"), "info")
+        self.assertEqual(ids.get("blend_slow_encoder_settings"), "info")  # no skipped frames
+        self.assertNotIn("fps_above_60", ids)
+
+    def test_slow_settings_evidence(self):
+        d = alog.diagnose(alog.analyze(blend_log()), "blend")
+        slow = next(p for p in d["problems"] if p["id"] == "blend_slow_encoder_settings")
+        self.assertIn("multipass qres", slow["evidence"])
+        self.assertIn("2 B-frames", slow["evidence"])
+        self.assertNotIn("preset", slow["evidence"])  # P4 is fast enough
+
+    def test_low_fps(self):
+        ids = problem_ids(alog.diagnose(alog.analyze(blend_log(fps="60/1", fmt="NV12")), "blend"))
+        self.assertEqual(ids.get("blend_fps_low"), "warning")
+        self.assertNotIn("blend_slow_encoder_settings", ids)  # only checked above 120 fps
+        self.assertNotIn("blend_color_format", ids)
+
+    def test_stream_still_warns_above_60(self):
+        ids = problem_ids(alog.diagnose(alog.analyze(blend_log(stream=True)), "blend"))
+        self.assertEqual(ids.get("fps_above_60"), "warning")
+
+    def test_default_goal_unchanged(self):
+        d = alog.diagnose(alog.analyze(blend_log()))
+        ids = problem_ids(d)
+        self.assertIsNone(d["summary"]["goal"])
+        self.assertEqual(ids.get("fps_above_60"), "info")
+        self.assertFalse([pid for pid in ids if pid.startswith("blend_")])
 
 
 class Errors(unittest.TestCase):

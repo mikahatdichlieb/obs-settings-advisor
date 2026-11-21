@@ -5,10 +5,11 @@
 
 A skill for Claude that suggests OBS Studio settings for your PC. It looks at your hardware and
 your OBS logs, checks the current requirements of Twitch, YouTube or Kick, and explains every
-value it recommends. If you ask, it also writes a [blur](https://github.com/f0e/blur) config that
-matches your recordings.
+value it recommends. If you ask, it also writes a [blur](https://github.com/f0e/blur) config or a
+[Smoothie](https://github.com/couleur-tweak-tips/smoothie-rs) recipe that matches your recordings.
 
-It only reads. Your OBS configuration is never changed; you apply the settings yourself.
+It only reads. Your OBS configuration is never changed; you apply the settings yourself. blur
+and Smoothie configs are only written when you ask for it.
 
 <img src="assets/demo.svg" alt="Output of analyze_obs_log.py: NVENC at 6000 kbps, 2.9% dropped frames over Wi-Fi, 0.6% rendering lag" width="100%">
 
@@ -52,12 +53,15 @@ Ask Claude about your OBS setup, for example:
 
 - "My Twitch stream drops frames in Apex. What should I change?"
 - "Which settings should I use to record Valorant at 240 fps?"
+- "I record Minecraft at 240 fps for motion blur. Are my OBS settings right?"
 - "Make me a blur config, a bit less blurry than the default."
+- "Turn my blur config into a Smoothie recipe."
 - "Here's my blur config, why do my clips look so unclear?"
 
 What the skill does:
 
-1. Asks for what it can't detect: stream or record, platform, upload speed, which games.
+1. Asks for what it can't detect: stream or record (and whether the recording is for motion
+   blur), platform, upload speed, which games.
 2. Runs a hardware script: CPU, RAM, GPU and driver, hardware encoder, displays, OBS version.
 3. Looks up the current platform limits and OBS documentation.
 4. Finds your newest OBS log and analyzes it: encoder, resolution, FPS, and skipped, lagged and
@@ -65,9 +69,23 @@ What the skill does:
 5. Gives one table of settings with a reason for each value, plus alternatives where there is a
    real tradeoff. If your upload or hardware can't do what you're asking for, it says so.
 6. Ends with a short test: record 2-3 minutes of gameplay, then analyze the new log.
-7. Optionally writes a `.blur-config.cfg`. It first checks that the OBS recording suits blur
-   (FPS, rate control, no skipped frames), and it can review existing configs, including old blur
-   v1 configs whose keys v2 ignores.
+7. Optionally writes a `.blur-config.cfg` or a Smoothie recipe. It first checks that the OBS
+   recording suits frame blending (FPS, rate control, encoder preset, no skipped frames), and it
+   can review existing configs: old blur v1 configs whose keys v2 ignores, and Smoothie recipes
+   with typos that stop Smoothie.
+
+## Motion blur recordings
+
+For clips that blur or Smoothie turn into motion blur, the OBS recording is an intermediate file,
+and the skill sets it up that way:
+
+- 120 to 360 fps through "Fractional FPS Value" (the other FPS fields in OBS stop at 60 and 120),
+  quality-based rate control, a fast encoder preset and NV12.
+- A test recording checked with `analyze_obs_log.py --goal blend`: skipped frames, slow encoder
+  settings, FPS that don't divide evenly into the output FPS.
+- On Linux, a capture source that fits X11 or Wayland, including obs-vkcapture for games.
+- Then the blur config or Smoothie recipe, as a code block or, if you ask, as a file. Existing
+  configs are never overwritten without your OK.
 
 ## Scripts
 
@@ -76,7 +94,7 @@ Python 3.8+.
 
 | Script | Purpose |
 |---|---|
-| `detect_hardware.sh` / `.ps1` | Hardware and OBS version (bash for macOS and Linux, PowerShell for Windows) |
+| `detect_hardware.sh` / `.ps1` | Hardware and OBS version, on Linux also session type and capture tools (bash for macOS and Linux, PowerShell for Windows) |
 | `find_obs_logs.sh` / `.ps1` | Newest three OBS logs, and the newest one that contains a finished recording or stream |
 | `analyze_obs_log.py` | Turns an OBS log into JSON with frame statistics and detected problems |
 
@@ -85,6 +103,7 @@ cd skills/obs-settings-advisor/scripts
 bash detect_hardware.sh
 bash find_obs_logs.sh
 python3 analyze_obs_log.py "~/.config/obs-studio/logs/<file>.txt"
+python3 analyze_obs_log.py "~/.config/obs-studio/logs/<file>.txt" --goal blend  # recording for blur/Smoothie
 ```
 
 ```powershell
@@ -109,6 +128,7 @@ Problems the analyzer reports:
 | `obs_on_integrated_gpu` | OBS runs on the integrated GPU of a laptop that has a dedicated one |
 | `stream_not_cbr`, `stream_keyframe_interval` | Stream encoder not set to CBR or 2 s keyframes |
 | `fps_above_60`, `x264_with_hw_available`, `lookahead_under_load` | Settings that cost performance for little gain |
+| `blend_fps_low`, `blend_fps_uneven`, `blend_slow_encoder_settings`, `blend_bitrate_rate_control`, `blend_color_format` | With `--goal blend`: the high-FPS recording doesn't suit frame blending |
 
 ## Repository layout
 
@@ -116,7 +136,7 @@ Problems the analyzer reports:
 skills/obs-settings-advisor/
   SKILL.md          instructions Claude follows
   scripts/          detection, log finder, log analyzer
-  references/       encoders, platform limits, log patterns, sources, blur
+  references/       encoders, platform limits, log patterns, sources, blur, Smoothie
 tests/              unit tests, sample OBS logs, macOS mocks
 ```
 
@@ -135,4 +155,4 @@ device IDs and stream URLs from logs before sharing them.
 
 ## License
 
-MIT. Not affiliated with the OBS Project or blur.
+MIT. Not affiliated with the OBS Project, blur or Smoothie.

@@ -150,6 +150,27 @@ simple and use the gaming GPU's encoder unless it is missing or overloaded.
 - `LIBVA_DRIVER_NAME` set to the wrong driver (OBS logs a warning) breaks VAAPI.
 - Wayland capture goes through PipeWire; capture cost is low, but check for rendering lag.
 
+### Linux capture source
+
+`detect_hardware.sh` reports `os.session_type` (x11/wayland) and `obs.capture_tools`. The capture
+source matters most for high-FPS recording (section 11):
+
+| Session | Source | Notes |
+|---|---|---|
+| X11 | Window Capture (Xcomposite) | Prefer it over Screen Capture (XSHM), which is slow. Turning off the compositor can help |
+| Wayland | Screen Capture (PipeWire) | Works everywhere; the compositor decides how often it delivers frames |
+| X11 or Wayland, Vulkan/OpenGL games | Game Capture from the obs-vkcapture plugin | Lowest cost. Start the game with `obs-gamecapture %command%` (Steam launch options). NVIDIA needs driver 515.43.04+ and `nvidia-drm.modeset=1`; on Wayland, OBS must run natively, not under XWayland |
+
+ctt.cx (community, undated) reports ~120 fps for XSHM, ~540 fps for Xcomposite and ~60 fps for
+PipeWire before lag sets in. Treat these as old field reports, not limits: confirm with a test
+recording and `rendering_lag` in the log.
+
+- Flatpak OBS needs the Flatpak plugin `com.obsproject.Studio.Plugin.OBSVkCapture`; games in
+  Flatpak Steam also need `org.freedesktop.Platform.VulkanLayer.OBSVkCapture`.
+- Pure high-FPS game recording without scenes or overlays: gpu-screen-recorder is a lighter
+  alternative to OBS. Mention it only when OBS cannot keep up.
+- Do not suggest the NvFBC plugin from older guides: it needs OBS 27 and a patched NVIDIA driver.
+
 ## 9. x264 (CPU)
 
 - Presets from ultrafast to veryslow; each slower step costs a lot more CPU for small gains.
@@ -164,3 +185,45 @@ Streaming HEVC/AV1 from OBS uses Enhanced RTMP or other modern protocols. Suppor
 platform (see `platforms.md`), the OBS version and the GPU. Viewers on old devices may get
 transcodes or fallbacks depending on the platform. Always verify the platform's current rules with
 a search before recommending HEVC/AV1 for a stream.
+
+## 11. High-FPS recording for frame blending (blur, Smoothie)
+
+The recording is an intermediate file: blur or Smoothie blend several recorded frames into each
+output frame, so every missing frame or encoding artifact shows up in the result. Speed and
+constant quality matter more than file size. Labels from OBS 33 (checked 2026-11-21).
+
+**Settings > Video**
+
+- **FPS:** "Common FPS Values" stops at 60 and "Integer FPS Value" at 120. For 144, 180, 240 or
+  360 fps pick "Fractional FPS Value" with Numerator = the FPS and Denominator = 1.
+- **Which FPS:** at least 120 (fewer real frames means more interpolation artifacts), ideally a
+  multiple of the final output FPS (60: 120, 180, 240, 300, 360). The game must render at least
+  that FPS, or the recording contains duplicates.
+- **Resolution:** Output (Scaled) = Base (Canvas). Lower the output only when the encoder cannot
+  keep up (pixels per second, section 3).
+
+**Settings > Advanced > Video:** Color Format NV12, Color Space sRGB or Rec. 709, Color Range
+Limited. I444 costs more encoder time, makes Smoothie's SVP interpolation take a slower path, and
+some formats crash Smoothie's RIFE pre-interpolation.
+
+**Settings > Output > Recording** (Output Mode: Advanced):
+
+| Setting | NVENC | AMF | QuickSync | x264 |
+|---|---|---|---|---|
+| Rate Control | CQP | CQP | ICQ | CRF |
+| Quality | CQ 14-18 | QP 16-20 | ICQ 20-23 (up to ~30 if frames are skipped) | CRF 12-16 |
+| Preset | P1-P4 | Speed or Balanced (Quality only with clear headroom) | TU7: Fastest (TU4 if the game renders on another GPU) | superfast/ultrafast |
+| Multipass / Look-ahead / Psycho Visual Tuning | Single pass, off, off | Pre-Analysis off | n/a | n/a |
+| Max B-frames | 0 | 0 | 0 | n/a |
+| Keyframe Interval | 0 (auto) | 0 (auto) | 0 (auto) | 0 (auto) |
+| Other | | | Latency: normal | x264 at 240 fps while gaming rarely keeps up |
+
+- **Codec:** H.264 is the safe choice. HEVC/AV1 give smaller files at the same quality if the GPU
+  encodes them and the blur tool and editor decode them.
+- **Container:** MKV or Hybrid MP4 (see Local recording in `platforms.md`). Plain fragmented MP4 can confuse
+  editors such as VEGAS; remux with File > Remux Recordings.
+- **Quick tests:** the Replay Buffer (Settings > Output > Replay Buffer) records into RAM and logs
+  the same frame statistics as a recording, so short tests leave no large files.
+
+Always confirm with `analyze_obs_log.py --goal blend`: skipped frames over 0.5% mean frames are
+missing and the blur will stutter. Fix preset, resolution or FPS before tuning the blur config.

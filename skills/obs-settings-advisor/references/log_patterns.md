@@ -94,6 +94,21 @@ Each encoder logs its settings when an output starts, for example:
 | `Running as administrator: false` | Windows: no GPU priority for OBS |
 | `Game Mode: On`, `Hardware GPU Scheduler: On` | Windows gaming features state |
 
+## Frame-blending checks (`--goal blend`)
+
+For recordings meant for blur or Smoothie, run the analyzer with `--goal blend`. `fps_above_60` is
+then skipped (unless the log also contains a stream), and these are added:
+
+| Problem id | Trigger | Fix |
+|---|---|---|
+| `blend_fps_low` | Canvas FPS below 120 | Record 120-240+ fps via Fractional FPS Value, or expect interpolation artifacts |
+| `blend_fps_uneven` | FPS not a multiple of 60 (e.g. 144) | 120/180/240/300/360, or interpolate to a multiple of the output FPS |
+| `blend_slow_encoder_settings` | Above 120 fps: slow preset (P5-P7, slow, quality), multipass, look-ahead or B-frames on a recording encoder. Warning when frames were skipped | Fast preset, single pass, look-ahead off, Max B-frames 0 |
+| `blend_bitrate_rate_control` | Recording encoder uses CBR/VBR/ABR | CQP, ICQ or CRF |
+| `blend_color_format` | Color format other than NV12 | NV12, Limited range |
+
+Details and the full recording profile: `encoders.md` section 11.
+
 ## Hardware encoder errors
 
 Lines mentioning NVENC/AMF/QSV/VAAPI/VideoToolbox together with `error`, `fail` or `unable`

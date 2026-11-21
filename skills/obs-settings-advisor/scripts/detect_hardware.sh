@@ -91,6 +91,7 @@ gpu_json() {
 GPUS=()
 DISPLAYS=()
 OBS_INSTALLS=()
+CAPTURE_TOOLS=()
 OS_NAME="" OS_VERSION="" OS_BUILD="" KERNEL="" ARCH="" SESSION="" DESKTOP=""
 CPU_MODEL="" CPU_CORES="" CPU_THREADS="" CPU_MAX_MHZ="" CPU_PCORES="" CPU_ECORES=""
 RAM_MB="" IS_LAPTOP="" HW_MODEL="" CONTAINER=false VIRT=""
@@ -318,6 +319,15 @@ linux_obs() {
     v=$(run_t obs --version 2>/dev/null | sed -n 's/^OBS Studio - //p' | head -n 1)
     [ -n "$v" ] && OBS_INSTALLS+=("{\"source\":\"obs --version\",\"version\":$(jstr "$v")}")
   fi
+  # capture helpers for high-FPS recording (references/encoders.md, Linux capture source)
+  have obs-gamecapture && CAPTURE_TOOLS+=("$(jstr "obs-vkcapture")")
+  have gpu-screen-recorder && CAPTURE_TOOLS+=("$(jstr "gpu-screen-recorder")")
+  if have flatpak; then
+    run_t flatpak info com.obsproject.Studio.Plugin.OBSVkCapture >/dev/null 2>&1 &&
+      CAPTURE_TOOLS+=("$(jstr "obs-vkcapture (flatpak plugin)")")
+    run_t flatpak info com.dec05eba.gpu_screen_recorder >/dev/null 2>&1 &&
+      CAPTURE_TOOLS+=("$(jstr "gpu-screen-recorder (flatpak)")")
+  fi
 }
 
 # ---------------------------------------------------------------- macOS
@@ -440,7 +450,8 @@ OUT=$(
   printf '  "memory": {"total_mb":%s},\n' "$(jnum "$RAM_MB")"
   printf '  "gpus": [%s],\n' "$(join ${GPUS[@]+"${GPUS[@]}"})"
   printf '  "displays": [%s],\n' "$(join ${DISPLAYS[@]+"${DISPLAYS[@]}"})"
-  printf '  "obs": {"installs": [%s]},\n' "$(join ${OBS_INSTALLS[@]+"${OBS_INSTALLS[@]}"})"
+  printf '  "obs": {"installs": [%s],"capture_tools": [%s]},\n' "$(join ${OBS_INSTALLS[@]+"${OBS_INSTALLS[@]}"})" \
+    "$(join ${CAPTURE_TOOLS[@]+"${CAPTURE_TOOLS[@]}"})"
   printf '  "notes": ["hw_encoder.codecs with source inferred_from_model is a heuristic; the encoder list in an OBS log (analyze_obs_log.py available_video_encoders) is authoritative"],\n'
   printf '  "warnings": [%s]\n' "$warn_json"
   printf '}\n'

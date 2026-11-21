@@ -8,22 +8,13 @@ https://github.com/f0e/blur/releases) and the README's "Config settings explaine
 
 ## 1. Make the OBS recording fit blur first
 
-blur can only blend frames that exist. The OBS side decides the quality:
-
-| OBS setting (Settings > Output > Recording, Settings > Video) | For blur | Why |
-|---|---|---|
-| FPS | 120, 180, 240 or 360+: a multiple of the blur output FPS | More real frames mean less interpolation smearing; even multiples group cleanly |
-| Rate control | CQP / CQ (NVENC), CQP (AMF), ICQ (QSV), CRF (x264) | Quality-based. blur re-encodes anyway, so don't waste quality on CBR |
-| Quality | NVENC CQ 14-18, x264 CRF 12-16 | Recordings are an intermediate file; artifacts get blended into every output frame |
-| Preset | Fast: NVENC P1-P4, look-ahead and multipass off | At 240+ fps the encoder handles 4x the frames of 60 fps; slow presets skip frames |
-| Container | MKV or Hybrid MP4 | blur reads both through FFmpeg; MKV survives crashes |
-| Resolution | Native, or lower if the encoder can't keep up | 1440p240 needs ~7x the encoder throughput of 1080p60 |
+blur can only blend frames that exist, so the OBS side decides the quality. Use the high-FPS
+recording profile in `encoders.md` section 11 (FPS via Fractional FPS Value, quality-based rate
+control, fast preset, NV12) and confirm it with `analyze_obs_log.py --goal blend` before writing
+a config. blur reads MKV and Hybrid MP4 through FFmpeg.
 
 The game must render at least the recording FPS. If it runs at 144 fps and OBS records at 240, a
 third of the recorded frames are duplicates (`deduplicate` covers this partly, see below).
-
-**Confirm the high-FPS recording with the log analyzer:** skipped frames over 0.5% mean the
-recording is missing frames, and blur will stutter. Fix preset or resolution first.
 
 ## 2. Where the config goes
 
@@ -164,5 +155,6 @@ gpu interpolation: true
 gpu encoding: true
 ```
 
-Pair it with OBS recording settings from section 1 (240 fps, CQ ~16, fast NVENC preset, MKV), and
-check the next recording's log for skipped frames before blurring a whole session.
+Pair it with the OBS recording profile from `encoders.md` section 11 (240/1 fractional FPS, CQ ~16,
+NVENC P1-P4, MKV), and check the next recording's log with `--goal blend` before blurring a whole
+session. For the same look in Smoothie, see the key mapping in `smoothie.md`.

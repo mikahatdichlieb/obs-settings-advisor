@@ -52,6 +52,18 @@ and fall back to the snapshot in `platforms.md`, clearly labeled as possibly out
   https://wiki.archlinux.org/title/Hardware_video_acceleration (community wiki, accurate and current)
 - OBS Flatpak (runtime and NVIDIA extension notes): https://flathub.org/apps/com.obsproject.Studio
 
+## Frame blending and high-FPS capture (community projects)
+
+Not official OBS documentation; check the repositories for the current version.
+
+- blur releases and README ("Config settings explained"): https://github.com/f0e/blur
+- Smoothie (smoothie-rs); the current recipe format is `target/defaults.ini`:
+  https://github.com/couleur-tweak-tips/smoothie-rs
+- Couleur Tweak Tips video docs (Smoothie recipe, OBS high-FPS recording, blur vs. Smoothie):
+  https://ctt.cx/video/ (community guide, partly older than the code; treat numbers as field
+  reports)
+- obs-vkcapture (Linux Vulkan/OpenGL game capture): https://github.com/nowrep/obs-vkcapture
+
 ## Search queries that work well
 
 - `site:obsproject.com/kb <topic>`

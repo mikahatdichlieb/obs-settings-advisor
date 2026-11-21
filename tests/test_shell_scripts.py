@@ -31,6 +31,22 @@ class DetectHardware(unittest.TestCase):
         home = os.path.expanduser("~")
         if len(home) > 1:
             self.assertNotIn(home, out)
+        self.assertIsInstance(d["obs"]["capture_tools"], list)
+
+    @unittest.skipUnless(platform.system() == "Linux", "capture tools are detected on Linux only")
+    def test_linux_capture_tools(self):
+        with tempfile.TemporaryDirectory() as bindir:
+            for tool in ("obs-gamecapture", "gpu-screen-recorder"):
+                path = os.path.join(bindir, tool)
+                with open(path, "w") as fh:
+                    fh.write("#!/bin/sh\nexit 0\n")
+                os.chmod(path, 0o755)
+            env = dict(os.environ, PATH=bindir + os.pathsep + os.environ.get("PATH", ""))
+            code, out, err = run("detect_hardware.sh", env)
+        self.assertEqual(code, 0, err)
+        tools = json.loads(out)["obs"]["capture_tools"]
+        self.assertIn("obs-vkcapture", tools)
+        self.assertIn("gpu-screen-recorder", tools)
 
     @unittest.skipIf(platform.system() == "Darwin", "mock is for exercising the macOS branch elsewhere")
     def test_mocked_macos(self):

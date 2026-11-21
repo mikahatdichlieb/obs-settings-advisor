@@ -5,7 +5,10 @@ Read-only: the log is opened for reading only and nothing is written to disk.
 Standard library only. Python 3.8+.
 
 Usage:
-    python3 analyze_obs_log.py <path-to-obs-log.txt> [--compact]
+    python3 analyze_obs_log.py <path-to-obs-log.txt> [--goal blend] [--compact]
+
+--goal blend: the recording is meant for frame blending (blur, Smoothie). FPS above 60 is then
+expected, and the high-FPS recording settings are checked instead (references/encoders.md section 11).
 
 The path may contain "~" or environment variables (%APPDATA%, $HOME); they are
 expanded, so the redacted paths printed by find_obs_logs.* can be passed as-is.
@@ -58,6 +61,7 @@ LOADED_ADAPTER_RE = re.compile(r"^Loading up (?:D3D11|OpenGL|Metal) on adapter (
 IGPU_RE = re.compile(r"intel|uhd|iris|radeon\(tm\) graphics|radeon graphics|vega \d+ graphics|\d{3}m graphics", re.I)
 DGPU_RE = re.compile(r"nvidia|geforce|radeon rx|radeon pro|arc a\d|arc b\d", re.I)
 HW_ENCODER_ID_RE = re.compile(r"nvenc|amf|qsv|videotoolbox|vaapi|apple vt|texture", re.I)
+SLOW_PRESETS = {"p5", "p6", "p7", "slow", "slower", "veryslow", "placebo", "quality", "highquality"}
 
 SYS_KEYS = (
     ("CPU Name: ", "cpu"),
@@ -366,12 +370,28 @@ def keyint_seconds(enc, fps):
     return None
 
 
+def slow_at_high_fps(st):
+    """Encoder settings that cost time per frame; references/encoders.md section 11 turns them off."""
+    found = []
+    if str(st.get("preset", "")).lower().replace(" ", "") in SLOW_PRESETS:
+        found.append(f"preset {st['preset']}")
+    mp = str(st.get("multipass", "")).lower()
+    if mp and mp not in ("disabled", "off", "false", "0"):
+        found.append(f"multipass {st['multipass']}")
+    if str(st.get("lookahead", "")).lower().startswith("true"):
+        found.append("look-ahead on")
+    bf = st.get("b-frames", st.get("bf"))
+    if isinstance(bf, (int, float)) and bf > 0:
+        found.append(f"{bf} B-frames")
+    return found
+
+
 def problem(res, pid, severity, evidence, meaning, fixes):
     res["problems"].append({"id": pid, "severity": severity, "evidence": evidence,
                             "meaning": meaning, "fix_hints": fixes})
 
 
-def diagnose(res):
+def diagnose(res, goal=None):
     res["problems"] = []
     sessions = res["sessions"]
     video = res["video"] or {}
@@ -393,6 +413,7 @@ def diagnose(res):
         "output_resolution": video.get("output resolution"),
         "downscale_filter": video.get("downscale filter"),
         "fps": fps,
+        "goal": goal,
         "sessions_analyzed": len(sessions),
         "worst_network_dropped_pct": dr,
         "worst_encoder_skipped_pct": sk,
@@ -484,7 +505,7 @@ def diagnose(res):
                     "Look-ahead costs encoder time.", ["Turn off look-ahead first when the encoder is overloaded."])
 
     stream_seen = res.pop("_stream_seen") or any(x["kind"] == "stream" for x in sessions)
-    if isinstance(fps, (int, float)) and fps > 60:
+    if isinstance(fps, (int, float)) and fps > 60 and (goal != "blend" or stream_seen):
         problem(res, "fps_above_60", "warning" if stream_seen else "info", f"Canvas FPS is {fps}.",
                 "Streaming platforms accept at most 60 FPS. For recordings every frame above 60 adds GPU and encoder load.",
                 ["Use 60 FPS (or 30) unless you need high-FPS recordings and have measured headroom."])
@@ -495,12 +516,57 @@ def diagnose(res):
                 f"x264 (CPU) in use while hardware encoders are available: {', '.join(hw[:4])}.",
                 "x264 competes with the game for CPU time; on a gaming PC a hardware encoder is usually the better choice.",
                 ["Try the hardware encoder; keep x264 only with large CPU headroom."])
+
+    if goal == "blend":
+        diagnose_blend(res, fps, video, sk)
     return res
+
+
+def diagnose_blend(res, fps, video, sk):
+    """Checks for recordings meant for frame blending (blur, Smoothie)."""
+    if isinstance(fps, (int, float)):
+        if fps < 120:
+            problem(res, "blend_fps_low", "warning", f"Canvas FPS is {fps}.",
+                    "Frame blending needs several real frames per output frame. Below 120 fps the blur tool has to "
+                    "interpolate most of them, which smears fast motion and HUDs.",
+                    ["Record at 120-240+ fps if the game reaches it (Settings > Video > Fractional FPS Value, e.g. 240/1).",
+                     "Otherwise expect artifacts, or use RIFE pre-interpolation in blur/Smoothie (much slower)."])
+        elif fps % 60:
+            problem(res, "blend_fps_uneven", "info", f"Canvas FPS is {fps}, not a multiple of 60.",
+                    "Recorded frames do not split evenly into 60 fps output frames, so the blur strength varies "
+                    "slightly from frame to frame.",
+                    ["Use 120, 180, 240, 300 or 360 fps (Fractional FPS Value, Denominator 1), "
+                     "or interpolate to a multiple of the output FPS (blur/Smoothie 'fps: 5x' style values)."])
+    fmt = str(video.get("format", ""))
+    if fmt and fmt.upper() != "NV12":
+        problem(res, "blend_color_format", "info", f"Color format is {fmt}.",
+                "Formats other than NV12 cost more encoder time. Smoothie's SVP interpolation takes a slower path "
+                "with I444, and its RIFE pre-interpolation can crash with some formats.",
+                ["Settings > Advanced > Video: Color Format NV12, Color Range Limited, unless you need HDR or 4:4:4."])
+    for e in res["encoders"]:
+        if e["role"] != "recording":
+            continue
+        st = e["settings"]
+        rc = str(st.get("rate_control", "")).upper()
+        if rc in ("CBR", "VBR", "ABR"):
+            problem(res, "blend_bitrate_rate_control", "info", f"Recording encoder '{e['name']}' uses {rc}.",
+                    "A bitrate target is spread over every frame. At high FPS each frame gets little, and fast "
+                    "motion turns blocky before it is blended into every output frame.",
+                    ["Use quality-based rate control: CQP (NVENC, AMF), ICQ (QuickSync), CRF (x264)."])
+        slow = slow_at_high_fps(st)
+        if slow and isinstance(fps, (int, float)) and fps > 120:
+            problem(res, "blend_slow_encoder_settings", "warning" if sk is not None and sk >= WARN_PCT else "info",
+                    f"Recording encoder '{e['name']}' at {fps} fps: {', '.join(slow)}.",
+                    "These settings cost encoder time per frame. At high FPS they are the usual cause of skipped "
+                    "frames, which make the blurred video stutter.",
+                    ["Fast preset (NVENC P1-P4, AMF Speed/Balanced), single pass, look-ahead off, Max B-frames 0."])
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Analyze an OBS Studio log file (read-only) and print JSON.")
     ap.add_argument("log", help="path to an OBS log .txt file (~ and environment variables are expanded)")
+    ap.add_argument("--goal", choices=["blend"],
+                    help="blend: recording for frame blending (blur, Smoothie); checks high-FPS recording settings")
     ap.add_argument("--compact", action="store_true", help="print single-line JSON")
     args = ap.parse_args(argv)
 
@@ -521,7 +587,7 @@ def main(argv=None):
               file=sys.stderr)
         return 3
 
-    res = diagnose(analyze(lines))
+    res = diagnose(analyze(lines), args.goal)
     # most useful keys first; the rest keeps parse order
     out = {"log_file": redact(os.path.basename(path)), "obs_version": res.pop("obs_version"),
            "summary": res.pop("summary"), "problems": res.pop("problems"), **res}
